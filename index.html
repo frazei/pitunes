@@ -6,65 +6,48 @@
   <script src="libs/utils.js"></script>
   <script src="libs/purl.js"></script>
   <script src="js-subsonic/jqsubsonic.js"></script>
+  <script src="pitunes.js"></script>
   <script>
-  var subsonic = {
+  var settings = {
     server: 'http://192.168.2.203:4040',
     username: 'jukebox',
     password: 'pippo',
-    bitrate: 0
-  };
+    bitrate: 0,
+    listlen: 10, // step di visualizzazione copertine
+    watchInt: 10000 // tempo di aggiornamento del player
+    },
+    albumList = {},
+    offset = 0,
+    playingInt = null;
   // mi connetto al server
-  JQSubSonic.open(subsonic.server, subsonic.username, subsonic.password, subsonic.bitrate, function(err, res) {
+  JQSubSonic.open(settings.server, settings.username, settings.password, settings.bitrate, function(err, res) {
     if (err) {
       console.warn("err", err, err.error, typeof err.error);
       return;
     } else {
-      console.log(res);
-      var params = {
-        size: 20
-      };
-      // ottengo la lista degli album
-      JQSubSonic.getAlbumList('recent', params, function(err2, res2) {
-        if (err2) {
-          console.warn("err2", err2, err2.error, typeof err2.error);
-          return;
-        } else {
-          console.log(res2);
-          console.log('dischi: '+res2.albumList.album.length);
-          for (var i = 0; i < res2.albumList.album.length; i++) {
-            console.log(res2.albumList.album[i]);
-            var cover = JQSubSonic.getCoverArtURL(res2.albumList.album[i].coverArt, 250);
-            $('div#list').append("<div><img class='cover' ref='"+res2.albumList.album[i].id+"' src='"+cover+"' /></div>");
-          }
-        }
-      });
+      //console.log(res);
+      getAlbumList(settings.listlen, offset);
+      offset += settings.listlen;
     }
   });
-  var playingInt = null;
   function playingWatch() {
     playingInt = setInterval(function() {
       jukeGet();
-    }, 10000);
-  }
-  function jukeGet() {
-    JQSubSonic.jukeboxControl('get', null, function(err, res) {
-      if(err) {
-        console.warn("err", err, err.error, typeof err.error);
-        return;
-      } else {
-        console.log(res);
-        if(res.jukeboxPlaylist.playing) {
-          var song = res.jukeboxPlaylist.entry[res.jukeboxPlaylist.currentIndex]
-          $('div#nowPlaying').text(song.artist+" - "+song.title+" - "+song.album);
-        } else {
-          console.log('jukebox fermo');
-          $('div#nowPlaying').text('');
-          clearInterval(playingInt);
-        }
-      }
-    });
+    }, settings.watchInt);
   }
   $(function() {
+    // Each time the user scrolls
+    /*var win = $(window);
+  	win.scroll(function() {
+  		// End of the document reached?
+  		if ($(document).height() - win.height() == win.scrollTop()) {
+        console.log('end reached');
+      }
+    });*/
+    $('input#more').click(function() {
+      getAlbumList(settings.listlen, offset);
+      offset += settings.listlen;
+    });
     $('div#player input#play').click(function() {
       JQSubSonic.jukeboxControl('start', null, function(err, res) {
         if(err) {
@@ -89,26 +72,10 @@
         }
       });
     });
-    /*$('div#player input#update').click(function() {
-      JQSubSonic.jukeboxControl('get', null, function(err, res) {
-        if(err) {
-          console.warn("err", err, err.error, typeof err.error);
-          return;
-        } else {
-          console.log(res);
-          if(res.jukeboxPlaylist.playing) {
-            var song = res.jukeboxPlaylist.entry[res.jukeboxPlaylist.currentIndex]
-            $('div#nowPlaying').text(song.artist+" - "+song.title+" - "+song.album);
-          } else {
-            console.log('jukebox fermo');
-          }
-        }
-      });
-    });*/
-    $('div#list').on('click', 'img.cover', function() {
+    $('div#list').on('click', 'div.album', function() {
       var id = $(this).attr('ref');
       console.log('hai cliccato: '+id);
-      params = {
+      /*params = {
         id: id
       };
       JQSubSonic.jukeboxControl('set', params, function(err, res) {
@@ -118,42 +85,85 @@
         } else {
           console.log(res);
         }
-      });
-      /*JQSubSonic.getMusicDirectory(id, function(err, res) {
-        if(err) {
-          console.warn("err", err, err.error, typeof err.error);
-          return;
-        } else {
-          console.log('canzoni: '+res.album.song.length);
-          for (var i = 0; i < res.album.song.length; i++) {
-            console.log(res.album.song[i]);
-          }
-        }
       });*/
+      $('div#detail div.albumDetails').html('loading...');
+      $(this).toggleClass('flip');
+      getDetails(id);
+      $('div#detail').toggle();
+    });
+    $('div#detail div.close').click(function() {
+      $('div#detail').hide();
+      $('div.album').removeClass('flip');
     });
     jukeGet();
     playingWatch();
   });
   </script>
+  <link rel="stylesheet" href="style.css" />
   <style>
+  body {
+    font-family: sans-serif;
+  }
   div#player {
     border: 1px solid black;
+    width: 100%;
+  }
+  div#detail {
+    position: fixed;
+    width: 600px;
+    height: 500px;
+    margin: 0 auto;
+    left: 50%;
+    top: 50%;
+    margin-top: -250px;
+    margin-left: -300px;
+    background-color: #fff;
+    z-index: 1000;
+    border: 1px solid black;
+    display: none;
+  }
+  div#detail div.close {
+    text-align: right;
+  }
+  div#detail div.albumDetails div.left {
+    float: left;
+    width: 250px;
+    height: 100%;
+    border-right: 1px solid #cecece;
+    text-align: center;
+  }
+  div#detail div.albumDetails div.right {
+    float: left;
     width: 100%;
   }
   div#list {
     margin: auto;
     width: 100%;
   }
-  div#list div {
+  div#list > div {
     text-align: center;
     width: 250px;
-    margin: 5px;
-    float: left;
-  }
-  div#list div > img {
-    width: 250px;
     height: 250px;
+    margin: auto;
+    float: left;
+    margin: 10px 5px;
+  }
+  div.back img.cover {
+    transform: scaleX(-1);
+    filter: opacity(.2) grayscale(80%);
+  }
+  img.cover {
+    width: 200px;
+    height: 200px;
     background-color: #000;
+    box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.75);
+    margin-bottom: 10px;
+  }
+  div.title, div.artist {
+    clear: both;
+  }
+  div.title {
+    font-weight: bold;
   }
   </style>
 </head>
@@ -161,10 +171,15 @@
   <h2>pitunes</h2>
   <div id='player'>
     <input type='button' id='play' value='play' />
-    <input type='button' id='stop' value='stop' />
-    <input type='button' id='update' value='update' /><br />
-    Now Playing: <div id='nowPlaying' /><br />
+    <input type='button' id='stop' value='stop' /><br />
+    Now Playing: <div id='nowPlaying'></div><br />
   </div>
   <div id='list'></div>
+  <div id='detail'>
+    <div class='close'>[close]</div>
+    <div class='albumDetails'>loading...</div>
+  </div>
+  <div style='clear: both'></div>
+  <input type='button' id='more' value='more' />
 </body>
 </html>

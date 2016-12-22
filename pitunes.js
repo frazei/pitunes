@@ -4,7 +4,8 @@ function getAlbumList(size = 20, offset = 0) {
     offset: offset
   };
   // ottengo la lista degli album
-  JQSubSonic.getAlbumList('recent', params, function(err, res) {
+  console.log('ottengo la lista '+settings.type);
+  JQSubSonic.getAlbumList(settings.type, params, function(err, res) {
     if (err) {
       console.warn("err", err, err.error, typeof err.error);
       return 0;
@@ -47,12 +48,21 @@ function getDetails(id) {
           "<img class='cover' src='"+albumList[id].cover+"' /><br />\n"+
           "<div class='title'>"+albumList[id].album.title+"</div>\n"+
           "<div class='artist'>"+albumList[id].album.artist+"</div>\n"+
+          "<div id='playAll' ref='"+id+"'>\n"+
+            "<a href='javascript:void(0)'>Play all</a>\n"+
+          "</div>\n"+
         "</div>\n"+
         "<div class='right'>\n"
       );
-      console.log('canzoni: '+res.directory.child.length);
+      //console.log('canzoni: '+res.directory.child.length);
       for (var i = 0; i < res.directory.child.length; i++) {
-        $('div#detail div.albumDetails').append((i+1)+". "+res.directory.child[i].title+"<br />\n");
+        //console.log(res.directory.child[i]);
+        $('div#detail div.albumDetails').append(
+          "<div class='track' ref='"+res.directory.child[i].id+"'>"+
+            res.directory.child[i].track+". "+
+            res.directory.child[i].title+
+          "</div>\n"
+        );
       }
       $('div#detail div.albumDetails').append("</div>\n");
     }
@@ -73,6 +83,30 @@ function jukeGet() { // ottiene lo stato del player e la canzone in riproduzione
         $('div#nowPlaying').text('');
         clearInterval(playingInt);
       }
+    }
+  });
+}
+function jukePlay() {
+  JQSubSonic.jukeboxControl('start', null, function(err, res) {
+    if(err) {
+      console.warn("err", err, err.error, typeof err.error);
+      return;
+    } else {
+      console.log(res);
+      jukeGet();
+      if(res.jukeboxStatus.playing) playingWatch();
+    }
+  });
+}
+function jukeStop() {
+  JQSubSonic.jukeboxControl('stop', null, function(err, res) {
+    if(err) {
+      console.warn("err", err, err.error, typeof err.error);
+      return;
+    } else {
+      console.log(res);
+      if(!res.jukeboxStatus.playing) clearInterval(playingInt);
+      jukeGet();
     }
   });
 }

@@ -8,11 +8,19 @@
   <script src="js-subsonic/jqsubsonic.js"></script>
   <script src="pitunes.js"></script>
   <script>
+  function getUrlVars() {
+    var vars = {};
+  	var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+  		vars[key] = value;
+  	});
+  	return vars;
+  }
   var settings = {
     server: 'http://192.168.2.203:4040',
     username: 'jukebox',
     password: 'pippo',
     bitrate: 0,
+    type: (getUrlVars()["type"]) ? getUrlVars()["type"] : random,
     listlen: 10, // step di visualizzazione copertine
     watchInt: 10000 // tempo di aggiornamento del player
     },
@@ -49,43 +57,16 @@
       offset += settings.listlen;
     });
     $('div#player input#play').click(function() {
-      JQSubSonic.jukeboxControl('start', null, function(err, res) {
-        if(err) {
-          console.warn("err", err, err.error, typeof err.error);
-          return;
-        } else {
-          console.log(res);
-          jukeGet();
-          if(res.jukeboxStatus.playing) playingWatch();
-        }
-      });
+      jukePlay();
     });
     $('div#player input#stop').click(function() {
-      JQSubSonic.jukeboxControl('stop', null, function(err, res) {
-        if(err) {
-          console.warn("err", err, err.error, typeof err.error);
-          return;
-        } else {
-          console.log(res);
-          if(!res.jukeboxStatus.playing) clearInterval(playingInt);
-          jukeGet();
-        }
-      });
+      jukeStop();
     });
     $('div#list').on('click', 'div.album', function() {
+      $('div#detail').hide();
+      $('div.album').removeClass('flip');
       var id = $(this).attr('ref');
-      console.log('hai cliccato: '+id);
-      /*params = {
-        id: id
-      };
-      JQSubSonic.jukeboxControl('set', params, function(err, res) {
-        if(err) {
-          console.warn("err", err, err.error, typeof err.error);
-          return;
-        } else {
-          console.log(res);
-        }
-      });*/
+      console.log('hai premuto '+id);
       $('div#detail div.albumDetails').html('loading...');
       $(this).toggleClass('flip');
       getDetails(id);
@@ -95,80 +76,38 @@
       $('div#detail').hide();
       $('div.album').removeClass('flip');
     });
+    $('div#detail').on('click', 'div#playAll, div.track', function() {
+      var id = $(this).attr('ref');
+      console.log('hai premuto '+id);
+      params = {
+        id: id
+      };
+      JQSubSonic.jukeboxControl('set', params, function(err, res) {
+        if(err) {
+          console.warn("err", err, err.error, typeof err.error);
+          return;
+        } else {
+          console.log(res);
+          jukePlay();
+        }
+      });
+    });
     jukeGet();
     playingWatch();
   });
   </script>
   <link rel="stylesheet" href="style.css" />
-  <style>
-  body {
-    font-family: sans-serif;
-  }
-  div#player {
-    border: 1px solid black;
-    width: 100%;
-  }
-  div#detail {
-    position: fixed;
-    width: 600px;
-    height: 500px;
-    margin: 0 auto;
-    left: 50%;
-    top: 50%;
-    margin-top: -250px;
-    margin-left: -300px;
-    background-color: #fff;
-    z-index: 1000;
-    border: 1px solid black;
-    display: none;
-  }
-  div#detail div.close {
-    text-align: right;
-  }
-  div#detail div.albumDetails div.left {
-    float: left;
-    width: 250px;
-    height: 100%;
-    border-right: 1px solid #cecece;
-    text-align: center;
-  }
-  div#detail div.albumDetails div.right {
-    float: left;
-    width: 100%;
-  }
-  div#list {
-    margin: auto;
-    width: 100%;
-  }
-  div#list > div {
-    text-align: center;
-    width: 250px;
-    height: 250px;
-    margin: auto;
-    float: left;
-    margin: 10px 5px;
-  }
-  div.back img.cover {
-    transform: scaleX(-1);
-    filter: opacity(.2) grayscale(80%);
-  }
-  img.cover {
-    width: 200px;
-    height: 200px;
-    background-color: #000;
-    box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.75);
-    margin-bottom: 10px;
-  }
-  div.title, div.artist {
-    clear: both;
-  }
-  div.title {
-    font-weight: bold;
-  }
-  </style>
 </head>
 <body>
-  <h2>pitunes</h2>
+  <div id='pitunes'>
+    <h2>pitunes</h2>
+  </div>
+  <div id='type'>
+    <a href='?type=random'>random</a>
+    <a href='?type=newest'>newest</a>
+    <a href='?type=frequent'>frequent</a>
+    <a href='?type=recent'>recent</a>
+  </div>
   <div id='player'>
     <input type='button' id='play' value='play' />
     <input type='button' id='stop' value='stop' /><br />
@@ -176,7 +115,9 @@
   </div>
   <div id='list'></div>
   <div id='detail'>
-    <div class='close'>[close]</div>
+    <div class='close'>
+      <a href='javascript:void(0)'>close</a>
+    </div>
     <div class='albumDetails'>loading...</div>
   </div>
   <div style='clear: both'></div>

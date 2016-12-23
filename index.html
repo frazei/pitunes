@@ -20,7 +20,7 @@
     username: 'jukebox',
     password: 'pippo',
     bitrate: 0,
-    type: (getUrlVars()["type"]) ? getUrlVars()["type"] : random,
+    type: (getUrlVars()["type"]) ? getUrlVars()["type"] : 'random',
     listlen: 10, // step di visualizzazione copertine
     watchInt: 10000 // tempo di aggiornamento del player
     },
@@ -72,7 +72,7 @@
       getDetails(id);
       $('div#detail').toggle();
     });
-    $('div#detail div.close').click(function() {
+    $('div#detail div.close, div.modal').click(function() {
       $('div#detail').hide();
       $('div.album').removeClass('flip');
     });
@@ -114,11 +114,13 @@
     Now Playing: <div id='nowPlaying'></div><br />
   </div>
   <div id='list'></div>
-  <div id='detail'>
-    <div class='close'>
-      <a href='javascript:void(0)'>close</a>
+  <div id='detail' class='modal'>
+    <div class='modal-content'>
+      <div class='close'>
+        <a href='javascript:void(0)'>×</a>
+      </div>
+      <div class='albumDetails'>loading...</div>
     </div>
-    <div class='albumDetails'>loading...</div>
   </div>
   <div style='clear: both'></div>
   <input type='button' id='more' value='more' />

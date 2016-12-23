@@ -51,6 +51,7 @@ function getDetails(id) {
           "<div id='playAll' ref='"+id+"'>\n"+
             "<a href='javascript:void(0)'>Play all</a>\n"+
           "</div>\n"+
+        "<div style='clear: both'>&nbsp;</div>\n"+
         "</div>\n"+
         "<div class='right'>\n"
       );
@@ -64,7 +65,10 @@ function getDetails(id) {
           "</div>\n"
         );
       }
-      $('div#detail div.albumDetails').append("</div>\n");
+      $('div#detail div.albumDetails').append(
+        "<div style='clear: both'>&nbsp;</div>\n"+
+        "</div>\n"
+      );
     }
   });
 }

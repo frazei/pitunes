@@ -49,7 +49,7 @@ function getDetails(id) {
           "<div class='title'>"+albumList[id].album.title+"</div>\n"+
           "<div class='artist'>"+albumList[id].album.artist+"</div>\n"+
           "<div id='playAll' ref='"+id+"'>\n"+
-            "<a href='javascript:void(0)'>Play all</a>\n"+
+            "<a href='javascript:void(0)' class='button'>Play all</a>\n"+
           "</div>\n"+
         "<div style='clear: both'>&nbsp;</div>\n"+
         "</div>\n"+

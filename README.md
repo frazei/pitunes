@@ -8,14 +8,14 @@ $ git submodule update --init --recursive
 </pre>
 La configurazione si trova all'interno del file <i>index.html</i> nell'array <i>settings</i>:<br />
 <ul>
-  <li>server: url di accesso al server subsonic</li>
-  <li>username e password: utente con accesso alla modalità jukebox (vedi settings di subsonic)</li>
-  <li>listlen: quanti album visualizzare per volta</li>
-  <li>watchInt: intervallo di aggiornamento del player</li>
+  <li><i>server</i>: url di accesso al server subsonic</li>
+  <li><i>username e password</i>: utente con accesso alla modalità jukebox (vedi settings di subsonic)</li>
+  <li><i>listlen</i>: quanti album visualizzare per volta</li>
+  <li><i>watchInt</i>: intervallo di aggiornamento del player</li>
 </ul>
-<br />
+<h2>Modalità jukebox</h2>
 Per funzionare correttamente il dispositivo su cui è installato subsonic deve essere collegato ad un amplificatore tramite l'uscita audio (jack audio o hdmi).<br />
-Sul raspberry (con raspian o simili) è necessario <b>sistemare un paio di cose</b>:
+Sul raspberry (con raspian o simili) è necessario <b>sistemare un paio di cose</b>:<br />
 1. Impostare l'uscita audio di default (0=auto, 1=analog, 2=hdmi):
 <pre>
 $ amixer cset numid=3 1

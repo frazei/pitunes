@@ -52,16 +52,12 @@
         console.log('end reached');
       }
     });*/
-    $('input#more').click(function() {
+    $('a#more').click(function() {
       getAlbumList(settings.listlen, offset);
       offset += settings.listlen;
     });
-    $('div#player input#play').click(function() {
-      jukePlay();
-    });
-    $('div#player input#stop').click(function() {
-      jukeStop();
-    });
+    $('div#player a#play').click(jukePlay);
+    $('div#player a#stop').click(jukeStop);
     $('div#list').on('click', 'div.album', function() {
       $('div#detail').hide();
       $('div.album').removeClass('flip');
@@ -72,11 +68,17 @@
       getDetails(id);
       $('div#detail').toggle();
     });
-    $('div#detail div.close, div.modal').click(function() {
+    $('div#detail div.close a').click(function(e) {
       $('div#detail').hide();
       $('div.album').removeClass('flip');
     });
-    $('div#detail').on('click', 'div#playAll, div.track', function() {
+    $('div.modal').click(function(e) {
+      if($(e.target).attr('id') == 'detail') {
+        $('div#detail').hide();
+        $('div.album').removeClass('flip');
+      }
+    });
+    $('div#detail').on('click', 'a#playAll, div.track', function() {
       var id = $(this).attr('ref');
       console.log('hai premuto '+id);
       params = {
@@ -103,26 +105,26 @@
     <h2>pitunes</h2>
   </div>
   <div id='type'>
-    <a href='?type=random'>random</a>
-    <a href='?type=newest'>newest</a>
-    <a href='?type=frequent'>frequent</a>
-    <a href='?type=recent'>recent</a>
+    <a href='?type=random' class='button'>random</a>
+    <a href='?type=newest' class='button'>newest</a>
+    <a href='?type=frequent' class='button'>frequent</a>
+    <a href='?type=recent' class='button'>recent</a>
   </div>
   <div id='player'>
-    <input type='button' id='play' value='play' />
-    <input type='button' id='stop' value='stop' /><br />
+    <a href='javascript:void(0)' class='button' id='play'>play</a>
+    <a href='javascript:void(0)' class='button' id='stop'>stop</a><br />
     Now Playing: <div id='nowPlaying'></div><br />
   </div>
   <div id='list'></div>
   <div id='detail' class='modal'>
     <div class='modal-content'>
       <div class='close'>
-        <a href='javascript:void(0)'>×</a>
+        <a href='javascript:void(0)' class='button'>×</a>
       </div>
       <div class='albumDetails'>loading...</div>
     </div>
   </div>
   <div style='clear: both'></div>
-  <input type='button' id='more' value='more' />
+  <a href='javascript:void(0)' id='more' class='button'>more</a>
 </body>
 </html>

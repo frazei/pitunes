@@ -2,6 +2,7 @@ body {
 	font-family: sans-serif;
 	color: #fff;
 	background-color: #2B2B2B;
+	margin: 5px;
 }
 div#pitunes {
 	float: left;
@@ -15,7 +16,7 @@ div#type {
 	line-height: 100px;
 	text-align: right;
 }
-div#type a, div.close a, div#playAll a {
+a.button {
 	line-height: 30px;
 	height: 30px;
 	border: 1px solid #fff;
@@ -87,11 +88,11 @@ div#list {
 }
 div#list > div {
 	text-align: center;
-	width: 250px;
-	height: 250px;
+	width: 230px;
+	height: 230px;
 	margin: auto;
 	float: left;
-	margin: 10px 5px;
+	margin: 10px 0px;
 }
 div.back img.cover {
 	transform: scaleX(-1);

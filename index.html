@@ -26,7 +26,8 @@
     },
     albumList = {},
     offset = 0,
-    playingInt = null;
+    playingInt = null,
+    playlist = [];
   // mi connetto al server
   JQSubSonic.open(settings.server, settings.username, settings.password, settings.bitrate, function(err, res) {
     if (err) {
@@ -56,19 +57,31 @@
       getAlbumList(settings.listlen, offset);
       offset += settings.listlen;
     });
-    $('div#player a#play').click(jukePlay);
-    $('div#player a#stop').click(jukeStop);
+    $('div#player span#play').click(jukePlay);
+    $('div#player span#stop').click(jukeStop);
+    $('div#player span#playlist').click(function() {
+      $('div#detail').hide();
+      $('div#detail div.modal-content').html('');
+      $(playlist).each(function(i,song) {
+        $('div#detail div.modal-content').append(
+          "<div class='track'>\n"+
+            song.artist+" - "+song.title+" - "+song.album+"\n"+
+          "</div>\n"
+        );
+      });
+      $('div#detail').toggle();
+    });
     $('div#list').on('click', 'div.album', function() {
       $('div#detail').hide();
       $('div.album').removeClass('flip');
       var id = $(this).attr('ref');
       console.log('hai premuto '+id);
-      $('div#detail div.albumDetails').html('loading...');
+      $('div#detail div.modal-content').html('loading...');
       $(this).toggleClass('flip');
       getDetails(id);
       $('div#detail').toggle();
     });
-    $('div#detail div.close a').click(function(e) {
+    $('a#close').click(function(e) {
       $('div#detail').hide();
       $('div.album').removeClass('flip');
     });
@@ -101,30 +114,35 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id='player'>
+    <span class="icon button" id='play'>play3</span>
+    <span class="icon button" id='stop'>stop2</span>
+    <span class="icon button" id='playlist'>stack</span>
+    <div>
+      <span class="icon">headphones</span>
+      <span id='nowPlaying'>Player paused</span>
+    </div>
+  </div>
   <div id='pitunes'>
-    <h2>pitunes</h2>
+    <h2 onclick='location.reload()'>pitunes</h2>
   </div>
   <div id='type'>
-    <a href='?type=random' class='button'>random</a>
-    <a href='?type=newest' class='button'>newest</a>
-    <a href='?type=frequent' class='button'>frequent</a>
-    <a href='?type=recent' class='button'>recent</a>
-  </div>
-  <div id='player'>
-    <a href='javascript:void(0)' class='button' id='play'>play</a>
-    <a href='javascript:void(0)' class='button' id='stop'>stop</a><br />
-    Now Playing: <div id='nowPlaying'></div><br />
+    <a href='?type=random' class='button'><span class='icon'>random</span> random</a>
+    <a href='?type=newest' class='button'><span class='icon'>power</span> newest</a>
+    <a href='?type=frequent' class='button'><span class='icon'>heart</span> frequent</a>
+    <a href='?type=recent' class='button'><span class='icon'>history</span> recent</a>
   </div>
   <div id='list'></div>
   <div id='detail' class='modal'>
-    <div class='modal-content'>
+    <div class='modal-inside'>
       <div class='close'>
-        <a href='javascript:void(0)' class='button'>×</a>
+        <a href='javascript:void(0)' class='button' id='close'><span class="icon">cross</span>&nbsp;</a>
       </div>
-      <div class='albumDetails'>loading...</div>
+      <div class='modal-content'>loading...</div>
     </div>
   </div>
   <div style='clear: both'></div>
-  <a href='javascript:void(0)' id='more' class='button'>more</a>
+  <a href='javascript:void(0)' class='button' id='more'><span class="icon">plus</span> more</a>
+  <br /><br />
 </body>
 </html>

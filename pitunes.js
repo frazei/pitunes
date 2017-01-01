@@ -43,31 +43,29 @@ function getDetails(id) {
       console.warn("err", err, err.error, typeof err.error);
       return;
     } else {
-      $('div#detail div.albumDetails').html('').append(
+      $('div#detail div.modal-content').html('').append(
         "<div class='left'>\n"+
           "<img class='cover' src='"+albumList[id].cover+"' /><br />\n"+
           "<div class='title'>"+albumList[id].album.title+"</div>\n"+
           "<div class='artist'>"+albumList[id].album.artist+"</div>\n"+
-          "<div id='playAll' ref='"+id+"'>\n"+
-            "<a href='javascript:void(0)' class='button'>Play all</a>\n"+
-          "</div>\n"+
-        "<div style='clear: both'>&nbsp;</div>\n"+
+          "<a href='javascript:void(0)' class='button' id='playAll' ref='"+id+"'>\n"+
+            "<span class='icon'>play3</span> Play all\n"+
+          "</a>\n"+
         "</div>\n"+
-        "<div class='right'>\n"
+        "<div class='right'></div>\n"
       );
       //console.log('canzoni: '+res.directory.child.length);
       for (var i = 0; i < res.directory.child.length; i++) {
         //console.log(res.directory.child[i]);
-        $('div#detail div.albumDetails').append(
+        $('div#detail div.modal-content div.right').append(
           "<div class='track' ref='"+res.directory.child[i].id+"'>"+
             res.directory.child[i].track+". "+
             res.directory.child[i].title+
           "</div>\n"
         );
       }
-      $('div#detail div.albumDetails').append(
-        "<div style='clear: both'>&nbsp;</div>\n"+
-        "</div>\n"
+      $('div#detail div.modal-content div.right').append(
+        "<div style='clear:both'></div>"
       );
     }
   });
@@ -79,12 +77,13 @@ function jukeGet() { // ottiene lo stato del player e la canzone in riproduzione
       return;
     } else {
       console.log(res);
+      playlist = res.jukeboxPlaylist.entry;
       if(res.jukeboxPlaylist.playing) {
         var song = res.jukeboxPlaylist.entry[res.jukeboxPlaylist.currentIndex]
-        $('div#nowPlaying').text(song.artist+" - "+song.title+" - "+song.album);
+        $('span#nowPlaying').text(song.artist+" - "+song.title+" - "+song.album);
       } else {
         console.log('jukebox fermo');
-        $('div#nowPlaying').text('');
+        $('span#nowPlaying').text('Player paused');
         clearInterval(playingInt);
       }
     }

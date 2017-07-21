@@ -82,7 +82,7 @@ div#player div#nowPlayingDiv {
   text-overflow: ellipsis;
 }
 div#type {
-	width: 80%;
+	width: 100%;
 	line-height: 40px;
 }
 .button {
@@ -251,4 +251,29 @@ div.album {
 }
 .album.flip .back {
 	transform: rotateX(0deg) rotateY(0deg);
+}
+/*SLIDESHOW*/
+div#slides {
+    height: 100%;
+    background-color: #000;
+    overflow: hidden;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 10;
+}
+div#slides div {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	opacity: 0;
+}
+.transition {
+	-webkit-transition: 3s opacity 1.5s linear; /* Safari */
+	transition: 3s opacity 1.5s linear;
 }

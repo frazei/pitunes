@@ -1,12 +1,14 @@
 <html lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script src="libs/md5.js"></script>
   <script src="libs/utils.js"></script>
   <script src="libs/purl.js"></script>
   <script src="js-subsonic/jqsubsonic.js"></script>
   <script src="pitunes.js"></script>
+  <script src="slides.js"></script>
   <script>
   function getUrlVars() {
     var vars = {};
@@ -114,6 +116,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="slides" onclick="hideSlides()">&nbsp;</div>
   <div id='topbar'>
     <div id='pitunes'>
       <h2 onclick='location.reload()'>pitunes</h2>
@@ -134,6 +137,8 @@
       <a href='?type=newest' class='button'><span class='icon'>power</span> newest</a>
       <a href='?type=frequent' class='button'><span class='icon'>heart</span> frequent</a>
       <a href='?type=recent' class='button'><span class='icon'>history</span> recent</a>
+      &nbsp;&nbsp;&nbsp;
+      <span class='button' onclick="showSlides()"><span class='icon'>images</span> images</span>
     </div>
   </div>
   <div id='list'></div>

@@ -114,23 +114,27 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id='player'>
-    <span class="icon button" id='play'>play3</span>
-    <span class="icon button" id='stop'>stop2</span>
-    <span class="icon button" id='playlist'>stack</span>
-    <div>
-      <span class="icon">headphones</span>
-      <span id='nowPlaying'>Player paused</span>
+  <div id='topbar'>
+    <div id='pitunes'>
+      <h2 onclick='location.reload()'>pitunes</h2>
     </div>
-  </div>
-  <div id='pitunes'>
-    <h2 onclick='location.reload()'>pitunes</h2>
-  </div>
-  <div id='type'>
-    <a href='?type=random' class='button'><span class='icon'>random</span> random</a>
-    <a href='?type=newest' class='button'><span class='icon'>power</span> newest</a>
-    <a href='?type=frequent' class='button'><span class='icon'>heart</span> frequent</a>
-    <a href='?type=recent' class='button'><span class='icon'>history</span> recent</a>
+    <div id='player'>
+      <div id='buttons'>
+        <span class="icon button" id='play'>play3</span>
+        <span class="icon button" id='stop'>stop2</span>
+        <span class="icon button" id='playlist'>stack</span>
+      </div>
+      <div id='nowPlayingDiv'>
+        <span class="icon">headphones</span>
+        <span id='nowPlaying'>Player paused</span>
+      </div>
+    </div>
+    <div id='type'>
+      <a href='?type=random' class='button'><span class='icon'>random</span> random</a>
+      <a href='?type=newest' class='button'><span class='icon'>power</span> newest</a>
+      <a href='?type=frequent' class='button'><span class='icon'>heart</span> frequent</a>
+      <a href='?type=recent' class='button'><span class='icon'>history</span> recent</a>
+    </div>
   </div>
   <div id='list'></div>
   <div id='detail' class='modal'>
@@ -141,8 +145,9 @@
       <div class='modal-content'>loading...</div>
     </div>
   </div>
-  <div style='clear: both'></div>
-  <a href='javascript:void(0)' class='button' id='more'><span class="icon">plus</span> more</a>
+  <div id="moreButton">
+    <a href='javascript:void(0)' class='button' id='more'><span class="icon">plus</span> more</a>
+  </div>
   <br /><br />
 </body>
 </html>

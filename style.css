@@ -254,13 +254,15 @@ div.album {
 }
 /*SLIDESHOW*/
 div#slides {
-    height: 100%;
-    background-color: #000;
-    overflow: hidden;
-		position: fixed;
-		top: 0;
-		left: 0;
-		z-index: 10;
+	display: none;
+  height: 100%;
+  background-color: #000;
+  overflow: hidden;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 10;
+	text-align: center;
 }
 div#slides div {
 	position: absolute;
@@ -276,4 +278,36 @@ div#slides div {
 .transition {
 	-webkit-transition: 3s opacity 1.5s linear; /* Safari */
 	transition: 3s opacity 1.5s linear;
+}
+nav#slides-navigation {
+	display: none;
+	margin: 0 auto;
+  position: fixed;
+	left: 0;
+	top: 0;
+  z-index: 11;
+  top: 50%;
+  width: 100%;
+}
+nav#slides-navigation span {
+	font-family: 'IcoMoon-Free' !important;
+	color: #fff;
+	font-size: 48px;
+	width: 96px;
+	text-align: center;
+	line-height: 48px;
+	height: 48px;
+	text-decoration: none;
+}
+nav#slides-navigation span#next::before {
+	content: "\ea42";
+}
+nav#slides-navigation span#prev::before {
+	content: "\ea44";
+}
+nav#slides-navigation span#next {
+	float: right;
+}
+nav#slides-navigation span#prev {
+	float: left;
 }

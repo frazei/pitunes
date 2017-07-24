@@ -276,8 +276,7 @@ div#slides div {
 	opacity: 0;
 }
 .transition {
-	-webkit-transition: 3s opacity 1.5s linear; /* Safari */
-	transition: 3s opacity 1.5s linear;
+	transition: opacity 3s linear;
 }
 nav#slides-navigation {
 	display: none;
@@ -310,4 +309,12 @@ nav#slides-navigation span#next {
 }
 nav#slides-navigation span#prev {
 	float: left;
+}
+nav#slides-pagination {
+	display: none;
+	bottom: 0;
+	position: fixed;
+	width: 100%;
+	text-align: center;
+	z-index: 11;
 }

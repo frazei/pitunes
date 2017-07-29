@@ -34,12 +34,15 @@ function transitionend() {
 }
 function slideshow() {
   if($('div#slides').hasClass('auto')) {
+    $('div.slides').removeClass('transition');
     var next = (current+1 >= slides.length) ? 0 : current+1;
     console.log("current="+current+" | next="+next);
-    if(next == 0) $('div#slide_'+next).css('opacity', 1);
+    if(next == 0) {
+      $('div#slide_'+next).addClass('transition').css('opacity', 1); // la prima compare subito
+    }
     else {
-      $('div#slide_'+next).removeClass('transition').css('opacity', 1);
-      $('div#slide_'+current).addClass('transition').css('opacity', 0);
+      $('div#slide_'+next).css('opacity', 1); // quella sotto ha opacità 1 ma è coperta
+      $('div#slide_'+current).addClass('transition').css('opacity', 0); // faccio scomparire quella sopra
     }
     current = next;
     loadSlides();
@@ -84,11 +87,12 @@ function hideSlides() {
 
 $(function() {
   $('div#slides')
-    .css('width', $(document).width())
-    .css('height', $(document).height());
+    .css('width', $(window).width())
+    .css('height', $(window).height());
 
   $.getJSON( "config.json", function( data ) {
-    slides = shuffleArray(data['slides']);
+    //slides = shuffleArray(data['slides']);
+    slides = data['slides'];
     $(slides).each(function(i,v) {
       $('div#slides').append("<div id='slide_"+i+"' class='slides'></div>");
       $('div#slide_'+i).css('z-index', (i*-1));

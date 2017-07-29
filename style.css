@@ -11,7 +11,7 @@ body {
 	font-family: sans-serif;
 	color: #fff;
 	background-color: #2B2B2B;
-	margin: 8px;
+	margin: 0;
 }
 ::-webkit-scrollbar-track-piece{
 	background-color: transparent;
@@ -164,7 +164,7 @@ div#list {
 }
 div#list > div {
 	text-align: center;
-	width: 215px;
+	width: 175px;
 	height: 250px;
 	margin: auto;
 	float: left;
@@ -270,8 +270,8 @@ div#slides div {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-size: cover;
-	background-position: center;
+	background-size: contain;
+	background-position: top center;
 	background-repeat: no-repeat;
 	opacity: 0;
 }

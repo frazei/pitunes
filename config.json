@@ -1,19 +1,9 @@
 {
   "slides": [
-    "http://loremflickr.com/800/480/iceland?random=1",
-    "http://loremflickr.com/800/480/iceland?random=2",
-    "http://loremflickr.com/800/480/iceland?random=3",
-    "http://loremflickr.com/800/480/iceland?random=4",
-    "http://loremflickr.com/800/480/iceland?random=5",
-    "http://loremflickr.com/800/480/iceland?random=6",
-    "http://loremflickr.com/800/480/iceland?random=7",
-    "http://loremflickr.com/800/480/iceland?random=8",
-    "http://loremflickr.com/800/480/iceland?random=9",
-    "http://loremflickr.com/800/480/iceland?random=10",
-    "http://loremflickr.com/800/480/iceland?random=11",
-    "http://loremflickr.com/800/480/iceland?random=12",
-    "http://loremflickr.com/800/480/iceland?random=13",
-    "http://loremflickr.com/800/480/iceland?random=14",
-    "http://loremflickr.com/800/480/iceland?random=15"
+    "https://dummyimage.com/800x480/000/fff&text=uno",
+    "https://dummyimage.com/800x480/000/fff&text=due",
+    "https://dummyimage.com/800x480/000/fff&text=tre",
+    "https://dummyimage.com/800x480/000/fff&text=quattro",
+    "https://dummyimage.com/800x480/000/fff&text=cinque"
   ]
 }

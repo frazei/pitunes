@@ -2,8 +2,8 @@
   "slides": [
     "https://dummyimage.com/800x480/000/fff&text=uno",
     "https://dummyimage.com/800x480/000/fff&text=due",
-    "https://dummyimage.com/800x480/000/fff&text=tre",
-    "https://dummyimage.com/800x480/000/fff&text=quattro",
+    "https://dummyimage.com/480x800/fff/000&text=tre",
+    "https://dummyimage.com/480x800/fff/000&text=quattro",
     "https://dummyimage.com/800x480/000/fff&text=cinque"
   ]
 }

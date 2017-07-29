@@ -76,6 +76,7 @@ function stopAuto() {
 }
 function showSlides() {
   $('div#slides, nav#slides-navigation, nav#slides-pagination').css('display', 'block');
+  $('body').css('overflow', 'hidden');
   timer = setTimeout(function() {
     autoPlay();
   }, 10000);
@@ -83,6 +84,7 @@ function showSlides() {
 function hideSlides() {
   stopAuto();
   $('div#slides, nav#slides-navigation, nav#slides-pagination').css('display', 'none');
+  $('body').css('overflow', 'auto');
 }
 
 $(function() {

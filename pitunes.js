@@ -1,7 +1,9 @@
-function getAlbumList(size = 20, offset = 0) {
+/* http://www.subsonic.org/pages/api.jsp */
+
+function getAlbumList(size = 10, offset = 0) {
   var params = {
-    size: size,
-    offset: offset
+    'size': size,
+    'offset': offset
   };
   // ottengo la lista degli album
   console.log('ottengo la lista '+settings.type);
@@ -49,7 +51,10 @@ function getDetails(id) {
           "<div class='title'>"+albumList[id].album.title+"</div>\n"+
           "<div class='artist'>"+albumList[id].album.artist+"</div>\n"+
           "<a href='javascript:void(0)' class='button' id='playAll' ref='"+id+"'>\n"+
-            "<span class='icon'>play3</span> Play all\n"+
+            "<span class='icon'>play3</span> Play \n"+
+          "</a>\n"+
+          "<a href='javascript:void(0)' class='button' id='playRadio' ref='"+id+"'>\n"+
+            "<span class='icon'>lastfm</span> Radio \n"+
           "</a>\n"+
         "</div>\n"+
         "<div class='right'></div>\n"
@@ -64,9 +69,6 @@ function getDetails(id) {
           "</div>\n"
         );
       }
-      $('div#detail div.modal-content div.right').append(
-        "<div style='clear:both'></div>"
-      );
     }
   });
 }
@@ -78,38 +80,83 @@ function jukeGet() { // ottiene lo stato del player e la canzone in riproduzione
     } else {
       console.log(res);
       playlist = res.jukeboxPlaylist.entry;
+      currentSong = res.jukeboxPlaylist.currentIndex;
       if(res.jukeboxPlaylist.playing) {
-        var song = res.jukeboxPlaylist.entry[res.jukeboxPlaylist.currentIndex]
+        var song = playlist[currentSong];
         $('span#nowPlaying').text(song.artist+" - "+song.title+" - "+song.album);
       } else {
         console.log('jukebox fermo');
-        $('span#nowPlaying').text('Player paused');
+        if(playlist) {
+        	$('span#nowPlaying').text('Player paused');
+    	} else {
+    		$('span#nowPlaying').text('Player stopped');
+    	}
         clearInterval(playingInt);
       }
     }
   });
 }
 function jukePlay() {
-  JQSubSonic.jukeboxControl('start', null, function(err, res) {
-    if(err) {
-      console.warn("err", err, err.error, typeof err.error);
-      return;
-    } else {
-      console.log(res);
-      jukeGet();
-      if(res.jukeboxStatus.playing) playingWatch();
-    }
-  });
+	jukeGain(1); // imposto il volume al massimo
+	JQSubSonic.jukeboxControl('start', null, function(err, res) {
+		if(err) {
+			console.warn("err", err, err.error, typeof err.error);
+			return;
+		} else {
+			console.log(res);
+			jukeGet();
+			if(res.jukeboxStatus.playing) playingWatch();
+	    }
+	});
 }
 function jukeStop() {
-  JQSubSonic.jukeboxControl('stop', null, function(err, res) {
-    if(err) {
-      console.warn("err", err, err.error, typeof err.error);
-      return;
-    } else {
-      console.log(res);
-      if(!res.jukeboxStatus.playing) clearInterval(playingInt);
-      jukeGet();
-    }
-  });
+	JQSubSonic.jukeboxControl('clear', null, function(err, res) {
+    	if(err) {
+			console.warn("err", err, err.error, typeof err.error);
+			return;
+		} else {
+			console.log(res);
+			if(!res.jukeboxStatus.playing) clearInterval(playingInt);
+			jukeGet();
+		}
+	});
+}
+function jukePause() {
+	JQSubSonic.jukeboxControl('stop', null, function(err, res) {
+    	if(err) {
+			console.warn("err", err, err.error, typeof err.error);
+			return;
+		} else {
+			console.log(res);
+			if(!res.jukeboxStatus.playing) clearInterval(playingInt);
+			jukeGet();
+		}
+	});
+}
+function jukeSkip(index) {
+	console.log('index: '+index);
+	if(!index) index = currentSong+1;
+	params = {
+        index: index
+    };
+	JQSubSonic.jukeboxControl('skip', params, function(err, res) {
+    	if(err) {
+			console.warn("err", err, err.error, typeof err.error);
+			return;
+		} else {
+			console.log(res);
+			if(!res.jukeboxStatus.playing) clearInterval(playingInt);
+			jukeGet();
+		}
+	});
+}
+function jukeGain(gain) {
+	JQSubSonic.jukeboxControl('setGain', {'gain': gain}, function(err, res) {
+		if(err) {
+			console.warn("err", err, err.error, typeof err.error);
+			return;
+		} else {
+			console.log(res);
+		}
+	});
 }

@@ -22,10 +22,10 @@ function loadSlides() {
   var nnext = (current+2 >= slides.length) ? 0 : current+2;
 
   $('div#slide_'+nnext+', div#slide_'+pprev).css('background-image','');
-  $('nav#slides-pagination').html((current+1)+"/"+slides.length);
-  $('div#slide_'+current).css('opacity', 1).css('background-image','url('+slides[current]+')');
-  $('div#slide_'+next).css('background-image','url('+slides[next]+')');
-  $('div#slide_'+prev).css('background-image','url('+slides[prev]+')');
+  $('div#slides-pagination').html((current+1)+"/"+slides.length);
+  $('div#slide_'+current).css('opacity', 1).css('background-image','url('+slides[current][0]+')');
+  $('div#slide_'+next).css('background-image','url('+slides[next][0]+')');
+  $('div#slide_'+prev).css('background-image','url('+slides[prev][0]+')');
 }
 function transitionend() {
   timer = setTimeout(function() {
@@ -59,7 +59,7 @@ function slideTo(next) {
   loadSlides();
   timer = setTimeout(function() {
     autoPlay();
-  }, 10000);
+  }, 15000);
 }
 function autoPlay() {
   console.log('autoPlay');
@@ -75,43 +75,39 @@ function stopAuto() {
   $('div#slides').removeClass('auto');
 }
 function showSlides() {
-  $('div#slides, nav#slides-navigation, nav#slides-pagination').css('display', 'block');
-  $('body').css('overflow', 'hidden');
-  timer = setTimeout(function() {
-    autoPlay();
-  }, 10000);
+	$('div#slides, div#slides-close, div.slides-navigation, div#slides-pagination').css('display', 'block');
+	$('body').css('overflow', 'hidden');
+	timer = setTimeout(function() {
+    	autoPlay();
+  	}, 15000);
 }
 function hideSlides() {
   stopAuto();
-  $('div#slides, nav#slides-navigation, nav#slides-pagination').css('display', 'none');
+  $('div#slides, div#slides-close, div.slides-navigation, div#slides-pagination').css('display', 'none');
   $('body').css('overflow', 'auto');
 }
 
 $(function() {
-  $('div#slides')
-    .css('width', $(window).width())
-    .css('height', $(window).height());
-
-  $.getJSON( "config.json", function( data ) {
-    //slides = shuffleArray(data['slides']);
-    slides = data['slides'];
+    $.getJSON( "Pictures/config.json", function( data ) {
+    slides = shuffleArray(data['slides']);
+    //slides = data['slides'];
     $(slides).each(function(i,v) {
       $('div#slides').append("<div id='slide_"+i+"' class='slides'></div>");
-      $('div#slide_'+i).css('z-index', (i*-1));
+      $('div#slide_'+i).css('z-index', (i*-1)).css('background-size', v[1]).css('background-position', v[2]);
     });
 
-    // si esce dal fullscreen cliccando su una foto
-    $('div.slides').click(hideSlides);
+    // si esce dal fullscreen
+    $('div#slides-close').click(hideSlides);
 
     loadSlides();
   });
 
   // avanti e indietro manuale
-  $('nav#slides-navigation span#next').click(function() {
+  $('div.slides-navigation#next').click(function() {
     var next = (current+1 >= slides.length) ? 0 : current+1;
     slideTo(next);
   });
-  $('nav#slides-navigation span#prev').click(function() {
+  $('div.slides-navigation#prev').click(function() {
     var prev = (current-1 < 0) ? slides.length-1 : current-1;
     slideTo(prev);
   });

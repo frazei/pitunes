@@ -1,17 +1,18 @@
 html {
 	-webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Chrome/Safari/Opera */
-     -khtml-user-select: none; /* Konqueror */
-       -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   not supported by any browser */
+     -webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 body {
 	font-family: sans-serif;
 	color: #fff;
 	background-color: #2B2B2B;
 	margin: 0;
+	border: 0;
+	padding: 0;
 }
 ::-webkit-scrollbar-track-piece{
 	background-color: transparent;
@@ -64,6 +65,7 @@ div#pitunes {
 	min-width: 150px;
 	float: left;
 	height: 100px;
+	text-align: center;
 }
 div#player {
 	width: 80%;
@@ -126,19 +128,23 @@ a#playAll {
 div.modal div.close {
 	text-align: right;
 }
+div#detail div.modal-content > div {
+	float: left;
+}
 div#detail div.modal-content div.left {
 	text-align: center;
+	width: 40%;
 }
 div#detail div.modal-content div.right {
 	max-height: 360px;
-	overflow-y: scroll;
+	width: 60%;
 }
-@media only screen and (min-width:481px) {
+/*@media only screen and (min-width:481px) {
 	div#detail div.modal-content div.left {
 		float: left;
-		width: 250px;
+		width: 240px;
 		min-height: 400px;
-		border-right: 1px solid #fff;
+		
 	}
 	div#detail div.modal-content div.right {
 		float: left;
@@ -152,10 +158,18 @@ div#detail div.modal-content div.right {
 	.modal-inside {
 		max-height: 700px;
 	}
-}
+}*/
 div#detail div.track {
 	line-height: 25px;
-	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	white-space: nowrap;
+	overflow: hidden;
+  	text-overflow: ellipsis;
+  	width: 100%;
+  	clear: both;
+}
+div#detail div.track:last-of-type {
+	margin-bottom: 25px;
 }
 div#list {
 	clear: both;
@@ -191,7 +205,7 @@ div.title, div.artist {
 	clear: both;
 	white-space: nowrap;
 	overflow: hidden;
-  text-overflow: ellipsis;
+  	text-overflow: ellipsis;
 }
 div.title {
 	font-weight: bold;
@@ -230,7 +244,7 @@ div.album {
 	transform: rotateX(0deg) rotateY(0deg);
 	transform-style: preserve-3d;
 	backface-visibility: hidden;
-	transition: all .4s ease-in-out;
+	transition: transform .4s ease-in-out;
 }
 .album.flip .front {
 	z-index: 900;
@@ -247,7 +261,7 @@ div.album {
 	transform: rotateY(-180deg);
 	transform-style: preserve-3d;
 	backface-visibility: hidden;
-	transition: all .4s ease-in-out;
+	transition: transform .4s ease-in-out;
 }
 .album.flip .back {
 	transform: rotateX(0deg) rotateY(0deg);
@@ -255,9 +269,10 @@ div.album {
 /*SLIDESHOW*/
 div#slides {
 	display: none;
-  height: 100%;
-  background-color: #000;
-  overflow: hidden;
+	width: 100%;
+	height: 100%;
+  	background-color: #000;
+  	overflow: hidden;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -271,48 +286,71 @@ div#slides div {
 	width: 100%;
 	height: 100%;
 	background-size: contain;
+	background-color: #000;
 	background-position: top center;
 	background-repeat: no-repeat;
 	opacity: 0;
 }
 .transition {
-	transition: opacity 3s linear;
+	transition: opacity 2s ease-in-out;
 }
-nav#slides-navigation {
+div#slides-close {
 	display: none;
-	margin: 0 auto;
-  position: fixed;
-	left: 0;
+	position: fixed;
+	height: 24px;
 	top: 0;
-  z-index: 11;
-  top: 50%;
-  width: 100%;
-}
-nav#slides-navigation span {
+    z-index: 11;
 	font-family: 'IcoMoon-Free' !important;
-	color: #fff;
+	color: rgba(255,255,255,0.4);
+	font-size: 24px;
+	width: 24px;
+	text-align: center;
+	line-height: 24px;
+	text-decoration: none;
+	right: 0;
+}
+div#slides-close::before {
+	content: "\ea3b";
+}
+div.slides-navigation {
+	display: none;
+	position: fixed;
+	height: 48px;
+	top: 50%;
+    margin-top: -24px;
+	z-index: 11;
+	font-family: 'IcoMoon-Free' !important;
+	color: rgba(255,255,255,0.4);
 	font-size: 48px;
-	width: 96px;
+	width: 48px;
 	text-align: center;
 	line-height: 48px;
-	height: 48px;
 	text-decoration: none;
 }
-nav#slides-navigation span#next::before {
+div.slides-navigation#next {
+	right: 0;
+}
+div.slides-navigation#prev {
+	left: 0;
+}
+div.slides-navigation#next::before {
 	content: "\ea42";
 }
-nav#slides-navigation span#prev::before {
+div.slides-navigation#prev::before {
 	content: "\ea44";
 }
-nav#slides-navigation span#next {
-	float: right;
-}
-nav#slides-navigation span#prev {
-	float: left;
-}
-nav#slides-pagination {
+div#slides-pagination {
 	display: none;
 	bottom: 0;
+	position: fixed;
+	width: 100%;
+	text-align: center;
+	z-index: 11;
+	opacity: 0.4;
+}
+div#debug {
+	display: none;
+	top: 0;
 	position: fixed;
 	width: 100%;
 	text-align: center;

@@ -2,123 +2,198 @@
 <html lang="en">
 <head>
 	<title>pitunes</title>
-  	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  	<script src="libs/md5.js"></script>
-  	<script src="libs/utils.js"></script>
-  	<script src="libs/purl.js"></script>
-  	<script src="js-subsonic/jqsubsonic.js"></script>
-  	<script src="pitunes.js"></script>
-  	<script src="slides.js"></script>
-  	<script>
-  function getUrlVars() {
-    var vars = {};
-  	var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-  		vars[key] = value;
-  	});
-  	return vars;
-  }
-  var settings = {
-		server: 'http://192.168.2.203:4040',
-    	username: 'jukebox',
-    	password: 'pippo',
-    	bitrate: 0,
-    	type: (getUrlVars()["type"]) ? getUrlVars()["type"] : 'random',
-    	listlen: 12, // step di visualizzazione copertine
-    	watchInt: 10000 // tempo di aggiornamento del player
-    },
-    albumList = {},
-    offset = 0,
-    playingInt = null,
-    playlist = [],
-    currentSong = null;
-  // mi connetto al server
-  JQSubSonic.open(settings.server, settings.username, settings.password, settings.bitrate, function(err, res) {
-    if (err) {
-      console.warn("err", err, err.error, typeof err.error);
-      return;
-    } else {
-      //console.log(res);
-      getAlbumList(settings.listlen, offset);
-      offset += settings.listlen;
-    }
-  });
-  function playingWatch() {
-    playingInt = setInterval(function() {
-      jukeGet();
-    }, settings.watchInt);
-  }
-  $(function() {
-    // Each time the user scrolls
-    /*var win = $(window);
-  	win.scroll(function() {
-  		// End of the document reached?
-  		if ($(document).height() - win.height() == win.scrollTop()) {
-        console.log('end reached');
-      }
-    });*/
-    $('a#more').click(function() {
-      getAlbumList(settings.listlen, offset);
-      offset += settings.listlen;
-    });
-    $('div#player span#play').click(jukePlay);
-    $('div#player span#pause').click(jukePause);
-    $('div#player span#stop').click(jukeStop);
-    $('div#player span#forward').click(function() { jukeSkip(); });
-    $('div#player span#playlist').click(function() {
-      $('div#detail').hide();
-      $('div#detail div.modal-content').html('');
-      if(playlist) {
-	      $(playlist).each(function(i,song) {
-	        $('div#detail div.modal-content').append(
-	          "<div class='track'>\n"+
-	            song.artist+" - "+song.title+" - "+song.album+"\n"+
-	          "</div>\n"
-	        );
-	      });
-      } else {
-      	$('div#detail div.modal-content').text('Playlist empty');
-      }
-      $('div#detail').toggle();
-    });
-    $('div#list').on('click', 'div.album', function() {
-      $('div#detail').hide();
-      $('div.album').removeClass('flip');
-      var id = $(this).attr('ref');
-      console.log('hai premuto '+id);
-      $('div#detail div.modal-content').html('loading...');
-      $(this).toggleClass('flip');
-      getDetails(id);
-      $('div#detail').toggle();
-    });
-    $('a#close').click(function(e) {
-      $('div#detail').hide();
-      $('div.album').removeClass('flip');
-    });
-    $('div.modal').click(function(e) {
-      if($(e.target).attr('id') == 'detail') {
-        $('div#detail').hide();
-        $('div.album').removeClass('flip');
-      }
-    });
-    $('div#detail').on('click', 'a#playAll, div.track', function() {
-      var id = $(this).attr('ref');
-      console.log('hai premuto '+id);
-      params = {
-        id: id
-      };
-      JQSubSonic.jukeboxControl('set', params, function(err, res) {
-        if(err) {
-          console.warn("err", err, err.error, typeof err.error);
-          return;
-        } else {
-          console.log(res);
-          jukePlay();
-        }
-      });
-    });
-    $('div#detail').on('click', 'a#playRadio, div.track', function() {
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>-->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+	<script src="libs/md5.js"></script>
+	<script src="libs/utils.js"></script>
+	<script src="libs/purl.js"></script>
+	<script src="js-subsonic/jqsubsonic.js"></script>
+
+	<script src="pitunes.js"></script>
+	<script src="slides.js"></script>
+	<script>
+	function getUrlVars() {
+		var vars = {};
+		var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+			vars[key] = value;
+		});
+		return vars;
+	}
+  	var settings = {
+			server: 'http://192.168.2.203:4040',
+			username: 'jukebox',
+			password: 'pippo',
+			bitrate: 0,
+			type: (getUrlVars()["type"]) ? getUrlVars()["type"] : 'random',
+			listlen: 12, // step di visualizzazione copertine
+			watchInt: 10000, // tempo di aggiornamento del player in milliseconds
+			brightness: 255, // actual brightness
+			timeout: 60 // timeout backlight in seconds
+		},
+		screensaver = null, // interval backlight
+		screenIdle = 0, // interval counter
+		albumList = {},
+		offset = 0,
+		playingInt = null,
+		playlist = [],
+		currentSong = null;
+
+	function showSettings() {
+		$('div#detail div.modal-content').html('').append(
+			"<div id='settings'>\n"+
+				"Backlight: <br/>\n"+
+				"<input type='range' min='15' max='255' value='' class='slider' id='brightness'>\n"+
+				"<input type='text' value='' class='slider_value' id='actual_brightness'><br />\n"+
+				"Display dim timeout (seconds): <br/>\n"+
+				"<input type='range' min='5' max='3600' value='"+settings.timeout+"' class='slider' id='timeout'>\n"+
+				"<input type='text' value='"+settings.timeout+"' class='slider_value' id='actual_timeout'><br />\n"+
+				"<input type='button' value='Test Screensaver' onclick='startScreensaver()' /><br/>"+
+				"Wifi settings: <br/>\n"+
+				"<select id='wifi'></select><br/>"+
+				"<input type='text' id='wifi_pass'><input type='button' value='salva' />"+
+			"</div>"
+		);
+		getBrightness();
+		$('div#detail').show();
+	}
+
+	function getBrightness() {
+		$.getJSON("backlight.php?action=get", function( data ) {
+			console.log(data);
+			if(!data['brightness']) alert('Error reading LCD brightness');
+			else {
+				settings.brightness = data['brightness'];
+				$('div#detail input#brightness').val(data['brightness']);
+				$('div#detail input#actual_brightness').val(data['brightness']);
+			}
+		}).fail(function() {
+			console.log('Error reading LCD brightess (maybe not localhost?)');
+		});
+	}
+  	function setScreensaver() {
+		// TODO ci sarebbe anche il comando xprintidle che interroga il server X..
+		screenIdle = 0;
+		screensaver = setInterval(function() {
+			if(screenIdle > settings.timeout) {
+				console.log('avvio screensaver!');
+				startScreensaver();
+			}
+			screenIdle++;
+		}, 1000);
+	}
+	function startScreensaver() {
+		clearInterval(screensaver);
+		$.post( "backlight.php", { action: "set", brightness: 10 } );
+		$('div#screensaver').show().on('click', function() {
+			$(this).hide();
+			stopScreensaver();
+		});
+	}
+	function stopScreensaver() {
+		$.post( "backlight.php", { action: "set", brightness: settings.brightness } );
+		setScreensaver();
+	}
+
+	// mi connetto al server
+	JQSubSonic.open(settings.server, settings.username, settings.password, settings.bitrate, function(err, res) {
+		if (err) {
+			console.warn("err", err, err.error, typeof err.error);
+			return;
+		} else {
+			//console.log(res);
+			getAlbumList(settings.listlen, offset);
+			offset += settings.listlen;
+		}
+	});
+  	function playingWatch() {
+		playingInt = setInterval(function() {
+	  		jukeGet();
+		}, settings.watchInt);
+  	}
+  	$(function() {
+  		// Read actual brightness from monitor on start
+		getBrightness();
+
+		// start screensaver loop
+		setScreensaver();
+
+		// screen keep alive
+		$(window).click(function() {
+			screenIdle = 0;
+		});
+
+		// Each time the user scrolls
+		/*var win = $(window);
+		win.scroll(function() {
+			// End of the document reached?
+			if ($(document).height() - win.height() == win.scrollTop()) {
+				console.log('end reached');
+	  		}
+		});*/
+		$('a#more').click(function() {
+	  		getAlbumList(settings.listlen, offset);
+	  		offset += settings.listlen;
+		});
+		$('div#player span#play').click(jukePlay);
+		$('div#player span#pause').click(jukePause);
+		$('div#player span#stop').click(jukeStop);
+		$('div#player span#forward').click(function() { jukeSkip(); });
+		$('div#player span#playlist').click(function() {
+	  	$('div#detail').hide();
+	  	$('div#detail div.modal-content').html('');
+	  	if(playlist) {
+			$(playlist).each(function(i,song) {
+				$('div#detail div.modal-content').append(
+					"<div class='track'>\n"+
+					song.artist+" - "+song.title+" - "+song.album+"\n"+
+					"</div>\n"
+				);
+		  	});
+	  	} else {
+			$('div#detail div.modal-content').text('Playlist empty');
+	  	}
+	  	$('div#detail').toggle();
+	});
+	$('div#list').on('click', 'div.album', function() {
+		$('div#detail').hide();
+	 	$('div.album').removeClass('flip');
+	 	var id = $(this).attr('ref');
+		console.log('hai premuto '+id);
+		$('div#detail div.modal-content').html('loading...');
+		$(this).toggleClass('flip');
+		getDetails(id);
+		$('div#detail').toggle();
+	});
+	$('a#close').click(function(e) {
+		$('div#detail').hide();
+		$('div.album').removeClass('flip');
+	});
+	$('div.modal').click(function(e) {
+		if($(e.target).attr('id') == 'detail') {
+			$('div#detail').hide();
+			$('div.album').removeClass('flip');
+	  	}
+	});
+	$('div#detail').on('click', 'a#playAll, div.track', function() {
+		var id = $(this).attr('ref');
+		console.log('hai premuto '+id);
+		params = {
+			id: id
+	  	};
+	  	JQSubSonic.jukeboxControl('set', params, function(err, res) {
+			if(err) {
+		  		console.warn("err", err, err.error, typeof err.error);
+		  		return;
+			} else {
+		  		console.log(res);
+		  		jukePlay();
+			}
+	  	});
+	});
+	$('div#detail').on('click', 'a#playRadio, div.track', function() {
 		var id = $(this).attr('ref');
 		console.log('cerco '+id);
 		JQSubSonic.getSimilarSongs(id, false, 50, function(err, res) {
@@ -126,7 +201,7 @@
 				console.warn("err", err, err.error, typeof err.error);
 				return;
 			} else {
-        		jukeStop();
+				jukeStop();
 				console.log(res.similarSongs.song);
 				$(res.similarSongs.song).each(function() {
 					params = {
@@ -142,18 +217,26 @@
 					});
 				});
 				jukePlay();
-        	}
+			}
 		});
-    });
-    
-    jukeGet();
-    playingWatch();
-    //$('div#pitunes').append($(window).width()+"x"+$(window).height());
-  });
-  </script>
-  <link rel="stylesheet" href="style.css" />
+	});
+
+	jukeGet();
+	playingWatch();
+
+	$('div#detail').on('change', 'input#brightness', function() {
+		settings.brightness = $(this).val();
+		$('div#detail input#actual_brightness').val(settings.brightness);
+			$.post( "backlight.php", { action: "set", brightness: settings.brightness } );
+		});
+	});
+	</script>
+	<link rel="stylesheet" href="style.css" />
 </head>
 <body>
+	<!-- screensaver -->
+	<div id='screensaver'></div>
+
 	<!-- slides -->
 	<div id='slides'>&nbsp;</div>
 	<div id="slides-close">&nbsp;</div>
@@ -175,30 +258,31 @@
 			<span class="icon button" id='playlist'>stack</span>
 		</div>
 		<div id='nowPlayingDiv'>
-        	<span class="icon">headphones</span>
-        	<span id='nowPlaying'>Player stopped</span>
-      	</div>
-    </div>
-    <div id='type'>
-      <a href='?type=random' class='button'><span class='icon'>random</span> random</a>
-      <a href='?type=newest' class='button'><span class='icon'>power</span> newest</a>
-      <a href='?type=frequent' class='button'><span class='icon'>heart</span> frequent</a>
-      <a href='?type=recent' class='button'><span class='icon'>history</span> recent</a>
-      &nbsp;&nbsp;&nbsp;
-      <span class='button' onclick="showSlides()"><span class='icon'>images</span> images</span>
-    </div>
+			<span class="icon">headphones</span>
+			<span id='nowPlaying'>Player stopped</span>
+		</div>
+	</div>
+	<div id='type'>
+		<a href='?type=random' class='button'><span class='icon'>random</span> random</a>
+		<a href='?type=newest' class='button'><span class='icon'>power</span> newest</a>
+		<a href='?type=frequent' class='button'><span class='icon'>heart</span> frequent</a>
+		<a href='?type=recent' class='button'><span class='icon'>history</span> recent</a>
+	  &nbsp;&nbsp;&nbsp;
+		<span class='button' onclick="showSlides()"><span class='icon'>images</span> images</span>
+		<span class='icon button' onclick="showSettings()">cog</span>
+	</div>
   </div>
   <div id='list'>&nbsp;</div>
   <div id='detail' class='modal'>
-    <div class='modal-inside'>
-      <div class='close'>
-        <a href='javascript:void(0)' class='button' id='close'><span class="icon">cross</span>&nbsp;</a>
-      </div>
-      <div class='modal-content'>loading...</div>
-    </div>
+	<div class='modal-inside'>
+	  <div class='close'>
+		<a href='javascript:void(0)' class='button' id='close'><span class="icon">cross</span>&nbsp;</a>
+	  </div>
+	  <div class='modal-content'>loading...</div>
+	</div>
   </div>
   <div id="moreButton">
-    <a href='javascript:void(0)' class='button' id='more'><span class="icon">plus</span> more</a>
+	<a href='javascript:void(0)' class='button' id='more'><span class="icon">plus</span> more</a>
   </div>
   <br /><br />
   <div id="debug">debug</nav>

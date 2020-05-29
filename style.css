@@ -30,6 +30,7 @@ body {
 	background-color: #1F1F1F;
 }
 @font-face {
+	/* https://icomoon.io/#preview-free */
     font-family: 'IcoMoon-Free';
     src: url('IcoMoon-Free.ttf') format('truetype');
     font-weight: normal;
@@ -355,4 +356,52 @@ div#debug {
 	width: 100%;
 	text-align: center;
 	z-index: 11;
+}
+
+/* settings */
+#settings {
+	width: 100%; /* Width of the outside container */
+}
+
+/* The slider itself */
+.slider {
+	-webkit-appearance: none;  /* Override default CSS styles */
+	appearance: none;
+	width: 80%; /* Full-width */
+	height: 20px; /* Specified height */
+	background: #d3d3d3; /* Grey background */
+	outline: none; /* Remove outline */
+}
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+	-webkit-appearance: none; /* Override default look */
+	appearance: none;
+	width: 24px; /* Set a specific slider handle width */
+	height: 24px; /* Slider handle height */
+	background: #fff;
+}
+.slider::-moz-range-thumb {
+	width: 24px; /* Set a specific slider handle width */
+	height: 24px; /* Slider handle height */
+	background: #fff;
+}
+input.slider_value {
+	width: 50px;
+	background-color: #363636;
+	border: none;
+	color: white;
+	font-size: 1em;
+}
+
+div#screensaver {
+	display: none;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	overflow: hidden;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 10;
+	text-align: center;
 }
